@@ -5,7 +5,7 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
-export default function ChatHeader({ user }: { user: User | undefined }) {
+export default function ChatHeader({ user }: { user: User | null }) {
 	const router = useRouter();
 
 	const handleLoginWithGithub = () => {
