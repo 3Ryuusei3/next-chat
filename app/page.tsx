@@ -1,9 +1,9 @@
 import React from 'react'
 
-import ChatHeader from '@/components/ChatHeader'
 import { supabaseServer } from '@/lib/supabase/server'
 import InitUser from '@/lib/store/initUser';
-import { Input } from "@/components/ui/input"
+import ChatHeader from '@/components/ChatHeader'
+import ChatInput from '@/components/ChatInput';
 
 export default async function Page() {
 
@@ -37,9 +37,7 @@ export default async function Page() {
 
             </div>
           </div>
-          <div className='p-5'>
-            <Input placeholder='Send message...' />
-          </div>
+         <ChatInput />
         </div>
       </div>
       <InitUser user={data?.user}  />
