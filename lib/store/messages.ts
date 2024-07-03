@@ -16,8 +16,10 @@ export type Imessage = {
 
 interface MessagesState {
   messages: Imessage[];
+  addMessage:(message: Imessage) => void;
 }
 
 export const useMessages = create<MessagesState>()((set) => ({
   messages: [],
+  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
 }))

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { supabaseServer } from '@/lib/supabase/server'
-import InitUser from '@/lib/store/initUser';
+import InitUser from '@/lib/store/InitUser';
 import ChatHeader from '@/components/ChatHeader'
 import ChatInput from '@/components/ChatInput';
 import ChatMessages from '@/components/ChatMessages';
