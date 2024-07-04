@@ -31,6 +31,7 @@ export default function Message({ message }: { message: Imessage }) {
           <div className='flex items-center gap-1'>
             <h1 className='font-bold'>{message.users?.display_name}</h1>
             <h1 className='text-sm text-gray-400'>{new Date(message.created_at).toDateString()}</h1>
+            {message.is_edit && <span className='text-xs text-gray-600'>Edited</span>}
           </div>
           {message.users?.id === user?.id && (
             <MessageMenu message={message} />
@@ -53,7 +54,12 @@ const MessageMenu = ({ message }: { message: Imessage }) => {
       <DropdownMenuContent>
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => {
+          document.getElementById('trigger-edit')?.click();
+          setActionMessage(message);
+        }}>
+          Edit
+        </DropdownMenuItem>
         <DropdownMenuItem className='text-red-700' onClick={() => {
           document.getElementById('trigger-delete')?.click();
           setActionMessage(message);
