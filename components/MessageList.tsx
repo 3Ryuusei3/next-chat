@@ -1,12 +1,46 @@
 "use client"
 
-import { useMessages } from '@/lib/store/messages'
-import React from 'react'
+import { Imessage, useMessages } from '@/lib/store/messages'
+import React, { useEffect } from 'react'
 import Message from './Message';
 import { DeleteAlert, EditAlert } from './MessageActions';
+import { supabaseBrowser } from '@/lib/supabase/browser';
+import { toast } from 'sonner';
 
 export default function MessageList() {
-  const messages = useMessages((state) => state.messages);
+  const { messages, addMessage } = useMessages((state) => state);
+  const supabase = supabaseBrowser();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("chat-room")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        async (payload) => {
+          // console.log('Message inserted', payload);
+          const { error, data } = await supabase
+            .from("users")
+            .select('*')
+            .eq('id', payload.new.send_by)
+            .single();
+          if (error) {
+            toast.error(error.message);
+          } else {
+            const newMessage = {
+              ...payload.new,
+              users: data
+            }
+            addMessage(newMessage as Imessage);
+          }
+        }
+      )
+      .subscribe();
+
+      return () => {
+        channel.unsubscribe();
+      }
+  }, [])
 
   return (
     <div className='flex-1 flex flex-col p-5 h-full overflow-y-auto'>
