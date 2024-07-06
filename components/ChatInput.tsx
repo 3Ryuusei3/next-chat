@@ -11,12 +11,13 @@ import { Imessage, useMessages } from '@/lib/store/messages';
 export default function ChatInput() {
   const user = useUser((state) => state.user);
   const addMessage = useMessages((state) => state.addMessage);
-
+  const setOptimisticsIds = useMessages((state) => state.setOptimisticIds);
   const supabase = supabaseBrowser();
   const handleMessage = async (text: string) => {
     if (text.trim()) {
+      const id = uuidv4();
       const newMessage = {
-        id: uuidv4(),
+        id,
         text,
         send_by: user?.id,
         is_edit: false,
@@ -29,8 +30,11 @@ export default function ChatInput() {
         }
       };
       addMessage(newMessage as Imessage);
+      setOptimisticsIds(newMessage.id);
 
-      const { error } = await supabase.from('messages').insert({ text });
+      const { error } = await supabase
+        .from('messages')
+        .insert({ text, id });
       if (error) {
         toast.message(error.message);
       }

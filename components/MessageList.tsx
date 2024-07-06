@@ -8,7 +8,7 @@ import { supabaseBrowser } from '@/lib/supabase/browser';
 import { toast } from 'sonner';
 
 export default function MessageList() {
-  const { messages, addMessage } = useMessages((state) => state);
+  const { messages, addMessage, optimiticsIds } = useMessages((state) => state);
   const supabase = supabaseBrowser();
 
   useEffect(() => {
@@ -19,19 +19,21 @@ export default function MessageList() {
         { event: "INSERT", schema: "public", table: "messages" },
         async (payload) => {
           // console.log('Message inserted', payload);
-          const { error, data } = await supabase
-            .from("users")
-            .select('*')
-            .eq('id', payload.new.send_by)
-            .single();
-          if (error) {
-            toast.error(error.message);
-          } else {
-            const newMessage = {
-              ...payload.new,
-              users: data
+          if (!optimiticsIds.includes(payload.new.id)) {
+            const { error, data } = await supabase
+              .from("users")
+              .select('*')
+              .eq('id', payload.new.send_by)
+              .single();
+            if (error) {
+              toast.error(error.message);
+            } else {
+              const newMessage = {
+                ...payload.new,
+                users: data
+              }
+              addMessage(newMessage as Imessage);
             }
-            addMessage(newMessage as Imessage);
           }
         }
       )
@@ -40,7 +42,7 @@ export default function MessageList() {
       return () => {
         channel.unsubscribe();
       }
-  }, [])
+  }, [messages])
 
   return (
     <div className='flex-1 flex flex-col p-5 h-full overflow-y-auto'>
