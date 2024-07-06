@@ -9,7 +9,13 @@ import { toast } from 'sonner';
 
 export default function MessageList() {
   const scrollRef = useRef() as React.MutableRefObject<HTMLDivElement>;
-  const { messages, addMessage, optimiticsIds } = useMessages((state) => state);
+  const {
+    messages,
+    addMessage,
+    optimiticsIds,
+    optimisticDeleteMessage,
+    optimisticUpdateMessage
+  } = useMessages((state) => state);
   const supabase = supabaseBrowser();
 
   useEffect(() => {
@@ -36,6 +42,22 @@ export default function MessageList() {
               addMessage(newMessage as Imessage);
             }
           }
+        }
+      )
+      .on (
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        (payload) => {
+          // console.log('Message deleted', payload);
+          optimisticDeleteMessage(payload.old.id);
+        }
+      )
+      .on (
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages" },
+        (payload) => {
+          // console.log('Message updated', payload);
+          optimisticUpdateMessage(payload.new as Imessage);
         }
       )
       .subscribe();
