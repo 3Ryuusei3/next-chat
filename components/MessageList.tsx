@@ -1,13 +1,14 @@
 "use client"
 
 import { Imessage, useMessages } from '@/lib/store/messages'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Message from './Message';
 import { DeleteAlert, EditAlert } from './MessageActions';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { toast } from 'sonner';
 
 export default function MessageList() {
+  const scrollRef = useRef() as React.MutableRefObject<HTMLDivElement>;
   const { messages, addMessage, optimiticsIds } = useMessages((state) => state);
   const supabase = supabaseBrowser();
 
@@ -42,10 +43,17 @@ export default function MessageList() {
       return () => {
         channel.unsubscribe();
       }
+  }, [messages]);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
   }, [messages])
 
   return (
-    <div className='flex-1 flex flex-col p-5 h-full overflow-y-auto'>
+    <div className='flex-1 flex flex-col p-5 h-full overflow-y-auto' ref={scrollRef}>
       <div className='flex-1 '>
 
       </div>
