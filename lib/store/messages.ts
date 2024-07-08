@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { LIMIT_MESSAGES } from '../constant';
 
 export type Imessage = {
 	created_at: string;
@@ -16,6 +17,8 @@ export type Imessage = {
 
 interface MessagesState {
   messages: Imessage[];
+	page: number;
+	hasMore: boolean;
   actionMessage: Imessage | undefined;
 	optimisticIds: string[];
   addMessage:(message: Imessage) => void;
@@ -23,16 +26,19 @@ interface MessagesState {
 	optimisticDeleteMessage: (messageId: string) => void;
 	optimisticUpdateMessage: (message: Imessage) => void;
 	setOptimisticIds: (id: string) => void;
+	setMessages: (messages: Imessage[]) => void;
 }
 
 export const useMessages = create<MessagesState>()((set) => ({
   messages: [],
+	page: 1,
+	hasMore: true,
   actionMessage: undefined,
 	optimisticIds: [],
   addMessage: (newMessages) =>
 		set((state) => ({
 			messages: [...state.messages, newMessages],
-			optimisticIds: [...state.optimisticIds, newMessages.id]
+			optimisticIds: [...state.optimisticIds, newMessages.id],
 		})),
   setActionMessage: (message) => set(() => ({ actionMessage: message })),
 	optimisticDeleteMessage: (messageId) => set((state) => {
@@ -52,4 +58,10 @@ export const useMessages = create<MessagesState>()((set) => ({
 		}
 	}),
 	setOptimisticIds: (id: string) => set((state) => ({ optimisticIds: [...state.optimisticIds, id]})),
+	setMessages: (newMessages) =>
+		set((state) => ({
+			messages: [...newMessages, ...state.messages],
+			page: state.page + 1,
+			hasMore: newMessages.length >= LIMIT_MESSAGES,
+		})),
 }))

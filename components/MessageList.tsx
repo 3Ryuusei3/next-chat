@@ -3,6 +3,7 @@
 import { Imessage, useMessages } from '@/lib/store/messages'
 import React, { useState, useEffect, useRef } from 'react'
 import Message from './Message';
+import LoadMoreMessages from './LoadMoreMessages';
 import { DeleteAlert, EditAlert } from './MessageActions';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { toast } from 'sonner';
@@ -101,12 +102,12 @@ export default function MessageList() {
 
   return (
     <div
-      className='flex-1 flex flex-col p-5 h-full overflow-y-auto'
+      className='flex-1 flex flex-col p-5 h-full overflow-y-auto gap-5'
       ref={scrollRef}
       onScroll={handleOnScroll}
     >
       <div className='flex-1 '>
-
+        <LoadMoreMessages />
       </div>
       <div className='space-y-7'>
         {messages.map((value, index) => {
